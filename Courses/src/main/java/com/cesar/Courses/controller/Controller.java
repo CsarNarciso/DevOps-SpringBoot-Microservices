@@ -3,8 +3,10 @@ package com.cesar.Courses.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,10 +37,12 @@ public class Controller {
 	private ResponseEntity<?> getStudentsInCourse(@PathVariable("courseId") Long courseId) {
 		
 		Map<String, Object> response = new HashMap<>();
-		Course course = repo.findById( courseId ).get();
+		Optional<Course> courseOpt = repo.findById( courseId );
 		
 		
-		if ( course != null ) {
+		if ( courseOpt.isPresent() ) {
+			
+			Course course = courseOpt.get();
 			
 			List<StudentDTO> students = client.getStudentsByCourse( courseId );
 			
@@ -49,11 +53,9 @@ public class Controller {
 				
 				return ResponseEntity.ok( response );
 			}
-			
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body( "No suscribed students yet" );
 		}
 		
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body( "Course not exists" );
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 	
 	

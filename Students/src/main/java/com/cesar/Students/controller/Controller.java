@@ -11,11 +11,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.cesar.Students.Persistence.Student;
 import com.cesar.Students.Persistence.StudentDTO;
 import com.cesar.Students.repository.Student_Repository;
 
+@RestController
+@RequestMapping("/students")
 public class Controller {
 
 	@PostMapping("/create")

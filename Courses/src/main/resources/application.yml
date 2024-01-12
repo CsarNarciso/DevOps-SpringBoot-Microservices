@@ -1,14 +1,3 @@
-server:
-  port: 8002
-
-spring:
+pring:
   application:
     name: msvc-Courses
-  datasource:
-    url: jdbc:mysql://localhost:3306/courses
-    username: root
-    password: 1029
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true

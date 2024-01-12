@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,17 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cesar.Courses.feign.FeignStudent;
 import com.cesar.Courses.persistence.Course;
 import com.cesar.Courses.persistence.StudentDTO;
-import com.cesar.Courses.repository.Course_Repository;
+import com.cesar.Courses.service.Course_Service;
 
 @RestController
 @RequestMapping("/courses")
 public class Controller {
 
 	
-	@PostMapping("/create")
+	@PostMapping(value="/create")
 	private ResponseEntity<?> create(@RequestBody Course course) {
 		
-		return ResponseEntity.status(HttpStatus.CREATED).body( repo.save( course ));
+		return ResponseEntity.status(HttpStatus.CREATED).body( service.create( course ));
 	}
 	
 	
@@ -37,7 +36,7 @@ public class Controller {
 	private ResponseEntity<?> getStudentsInCourse(@PathVariable("courseId") Long courseId) {
 		
 		Map<String, Object> response = new HashMap<>();
-		Optional<Course> courseOpt = repo.findById( courseId );
+		Optional<Course> courseOpt = service.getById( courseId );
 		
 		
 		if ( courseOpt.isPresent() ) {
@@ -59,9 +58,8 @@ public class Controller {
 	}
 	
 	
-	
 	@Autowired
-	private Course_Repository repo;
+	private Course_Service service;
 	
 	@Autowired
 	private FeignStudent client;

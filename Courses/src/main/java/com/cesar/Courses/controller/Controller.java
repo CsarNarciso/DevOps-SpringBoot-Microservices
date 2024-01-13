@@ -25,8 +25,17 @@ import com.cesar.Courses.service.Course_Service;
 public class Controller {
 
 	
+	
+	public Controller(Course_Service service) {
+		
+		super();
+		this.service = service;
+	}
+	
+	
+	
 	@PostMapping(value="/create")
-	private ResponseEntity<?> create(@RequestBody Course course) {
+	public ResponseEntity<?> create(@RequestBody Course course) {
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body( service.create( course ));
 	}
@@ -58,7 +67,6 @@ public class Controller {
 	}
 	
 	
-	@Autowired
 	private Course_Service service;
 	
 	@Autowired

@@ -3,22 +3,26 @@
  import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import com.cesar.Courses.persistence.Course;
 import com.cesar.Courses.repository.Course_Repository;
 
 public class Course_Service_ImplTest {
 
-	private Course_Repository repo = mock(Course_Repository.class);
+	@Mock
+	private Course_Repository repo;
 	
-	private Course_Service_Impl service = new Course_Service_Impl(repo);
+	@InjectMocks
+	private Course_Service_Impl service;
 	
 	private Long id;
 	private Course course;
@@ -26,6 +30,8 @@ public class Course_Service_ImplTest {
 	
 	@BeforeEach
 	void init() {
+		
+		MockitoAnnotations.openMocks(this);
 		
 		id = (long) 1;
 		

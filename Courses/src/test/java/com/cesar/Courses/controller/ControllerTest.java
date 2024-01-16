@@ -14,13 +14,13 @@ import org.springframework.http.ResponseEntity;
 
 import com.cesar.Courses.persistence.Course;
 import com.cesar.Courses.repository.Course_Repository;
-import com.cesar.Courses.service.Course_Service;
+import com.cesar.Courses.service.Course_Service_Impl;
 
 public class ControllerTest {
 	
 	private Course_Repository repo = mock(Course_Repository.class);
 	
-	private Course_Service service = new Course_Service(repo);
+	private Course_Service_Impl service = new Course_Service_Impl(repo);
 	
 	private Controller controller = new Controller(service);
 	

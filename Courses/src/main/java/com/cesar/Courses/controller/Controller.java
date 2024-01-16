@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cesar.Courses.feign.FeignStudent;
 import com.cesar.Courses.persistence.Course;
 import com.cesar.Courses.persistence.StudentDTO;
-import com.cesar.Courses.service.Course_Service;
+import com.cesar.Courses.service.Course_Service_Impl;
 
 @RestController
 @RequestMapping("/courses")
@@ -26,7 +26,7 @@ public class Controller {
 
 	
 	
-	public Controller(Course_Service service) {
+	public Controller(Course_Service_Impl service) {
 		
 		super();
 		this.service = service;
@@ -67,7 +67,7 @@ public class Controller {
 	}
 	
 	
-	private Course_Service service;
+	private Course_Service_Impl service;
 	
 	@Autowired
 	private FeignStudent client;

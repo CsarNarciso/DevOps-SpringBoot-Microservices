@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cesar.Courses.feign.FeignStudent;
 import com.cesar.Courses.persistence.Course;
 import com.cesar.Courses.persistence.StudentDTO;
 import com.cesar.Courses.service.Course_Service_Impl;
@@ -23,26 +22,35 @@ import com.cesar.Courses.service.Course_Service_Impl;
 @RestController
 @RequestMapping("/courses")
 public class Controller {
-
 	
 	
-	public Controller(Course_Service_Impl service) {
-		
-		super();
-		this.service = service;
-	}
-	
-	
-	
-	@PostMapping(value="/create")
+	@PostMapping("/create")
 	public ResponseEntity<?> create(@RequestBody Course course) {
 		
-		return ResponseEntity.status(HttpStatus.CREATED).body( service.create( course ));
+		if ( course.getName() != null ) { 
+			
+			if ( ! course.getName().isBlank() ) {
+				
+				if ( course.getId() != null ) {
+					
+					course.setId(null);
+				}
+				
+				Course response = service.create( course );
+				
+				if ( response != null ) {
+					
+					return ResponseEntity.status(HttpStatus.CREATED).body( response );
+				}
+			}
+		}
+			
+		return ResponseEntity.badRequest().body( "Name required" );
 	}
 	
 	
 	@GetMapping("/{courseId}/getStudents")
-	private ResponseEntity<?> getStudentsInCourse(@PathVariable("courseId") Long courseId) {
+	public ResponseEntity<?> getStudentsInCourse(@PathVariable("courseId") Long courseId) {
 		
 		Map<String, Object> response = new HashMap<>();
 		Optional<Course> courseOpt = service.getById( courseId );
@@ -52,9 +60,9 @@ public class Controller {
 			
 			Course course = courseOpt.get();
 			
-			List<StudentDTO> students = client.getStudentsByCourse( courseId );
+			List<StudentDTO> students = service.getStudentsByCourse( courseId );
 			
-			if ( students != null && ! students.isEmpty() ) {
+			if ( ! students.isEmpty() ) {
 				
 				response.put( "courseName", course.getName() );
 				response.put("students", students);
@@ -67,8 +75,7 @@ public class Controller {
 	}
 	
 	
-	private Course_Service_Impl service;
-	
+
 	@Autowired
-	private FeignStudent client;
+	private Course_Service_Impl service;
 }

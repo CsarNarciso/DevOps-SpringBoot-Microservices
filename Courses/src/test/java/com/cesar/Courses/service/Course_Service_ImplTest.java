@@ -45,6 +45,9 @@ public class Course_Service_ImplTest {
 	@Test
 	void create_success() {
 	
+		Course request = course;
+		request.setId(null);
+		
 		when( repo.save( any(Course.class))).thenReturn( course );
 		
 		Course response = service.create( course );
@@ -59,11 +62,12 @@ public class Course_Service_ImplTest {
 		
 		when( repo.findById(id)).thenReturn( Optional.of( course ));
 		
-		Optional<Course> foundCourse = service.getById(id);
+		Optional<Course> optionalFoundCourse = service.getById(id);
+		Course foundCourse = optionalFoundCourse.get();
 		
-		assertThat( foundCourse ).isNotEmpty();
-		assertThat( foundCourse.get() ).isNotNull();
-		assertEquals( foundCourse.get(), course );
+		assertThat( foundCourse ).isNotNull();
+		assertEquals( foundCourse.getId(), course.getId() );
+		assertEquals( foundCourse.getName(), course.getName() );
 	}
 	
 	

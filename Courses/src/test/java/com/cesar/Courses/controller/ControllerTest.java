@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -36,8 +37,18 @@ public class ControllerTest {
 	private MockMvc mvc;
 	
 	private Long id = 1L;
+	private Course existentedCourse;
 	
 	ObjectMapper mapper = new ObjectMapper();	
+	
+	
+	@BeforeEach
+	public void init() {
+		
+		existentedCourse = new Course();
+		existentedCourse.setId( id );
+		existentedCourse.setName( "Something" );
+	}
 	
 	
 	@Test
@@ -84,10 +95,6 @@ public class ControllerTest {
 	@Test
 	public void getStudentsInExistentedCourse_shouldReturnOk() throws Exception {
 	
-		Course existentedCourse = new Course();
-		existentedCourse.setId( id );
-		existentedCourse.setName( "Something" );
-		
 		StudentDTO student = new StudentDTO();
 		student.setName("Csar");
 		
@@ -112,10 +119,6 @@ public class ControllerTest {
 	
 	@Test
 	public void getStudentsInCourseWithNoStudents_shouldReturnEmptyStudentsListAndOk() throws Exception {
-	
-		Course existentedCourse = new Course();
-		existentedCourse.setId( id );
-		existentedCourse.setName( "Something" );
 		
 		List<StudentDTO> emptyStudentsList = new ArrayList<StudentDTO>();
 		

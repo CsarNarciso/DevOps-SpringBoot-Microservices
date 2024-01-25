@@ -62,13 +62,10 @@ public class Controller {
 			
 			List<StudentDTO> students = service.getStudentsByCourse( courseId );
 			
-			if ( ! students.isEmpty() ) {
-				
-				response.put( "courseName", course.getName() );
-				response.put("students", students);
-				
-				return ResponseEntity.ok( response );
-			}
+			response.put( "courseName", course.getName() );
+			response.put("students", students);
+			
+			return ResponseEntity.ok( response );
 		}
 		
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

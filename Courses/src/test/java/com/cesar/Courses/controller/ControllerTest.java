@@ -1,12 +1,13 @@
 package com.cesar.Courses.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class ControllerTest {
 	@Autowired
 	private MockMvc mvc;
 	
-	private Long id = (long) 1;
+	private Long id = 1L;
 	
 	ObjectMapper mapper = new ObjectMapper();	
 	
@@ -53,10 +54,10 @@ public class ControllerTest {
 		mvc.perform( post("/courses/create")
 				
 				.accept(MediaType.APPLICATION_JSON)
-				
 				.contentType(MediaType.APPLICATION_JSON)
 				.content( mapper.writeValueAsString( request ))
 			)
+		.andExpect( jsonPath("$.id", is(1) ))
 		.andExpect( status().isCreated() );
 		
 		verify( service ).create( any(Course.class) );
@@ -100,29 +101,53 @@ public class ControllerTest {
 				
 				.contentType(MediaType.APPLICATION_JSON)
 			)
-
 		.andExpect( status().isOk() );
 		
 		verify( service ).getById( id );
-		assertThat( service.getById( id )).isNotEmpty();
 		verify( service ).getStudentsByCourse( id );
 	}
 	
 	
+	
+	
+	@Test
+	public void getStudentsInCourseWithNoStudents_shouldReturnEmptyStudentsListAndOk() throws Exception {
+	
+		Course existentedCourse = new Course();
+		existentedCourse.setId( id );
+		existentedCourse.setName( "Something" );
+		
+		List<StudentDTO> emptyStudentsList = new ArrayList<StudentDTO>();
+		
+		when( service.getById(id) ).thenReturn( Optional.of(existentedCourse) );
+		when( service.getStudentsByCourse( id )).thenReturn( emptyStudentsList );
+		
+		mvc.perform( get("/courses/" + id + "/getStudents")
+				
+				.contentType(MediaType.APPLICATION_JSON)
+			)
+		.andExpect( jsonPath("$.students", is(emptyStudentsList) ))
+		.andExpect( status().isOk() );
+		
+		verify( service ).getById( id );
+		verify( service ).getStudentsByCourse( id );	
+	}
+	
+	
+	
 	@Test
 	public void getStudentsInNotExistentedCourse_shouldReturnNotFound() throws Exception {
-	
-		Long idNonExistentedCourse = (long) 1;
+		
+		Long idNonExistentedCourse = 1L;
 		
 		when( service.getById(idNonExistentedCourse)).thenReturn( Optional.empty() );
 		
 		mvc.perform( get("/courses/" + idNonExistentedCourse + "/getStudents")
 				.contentType(MediaType.APPLICATION_JSON))
-
+		
 		.andExpect( status().isNoContent() ); 
 		
 		verify( service ).getById( idNonExistentedCourse );
-		assertThat( service.getById( idNonExistentedCourse )).isEmpty();
 		verify( service, never() ).getStudentsByCourse( idNonExistentedCourse );	
 	}
 }

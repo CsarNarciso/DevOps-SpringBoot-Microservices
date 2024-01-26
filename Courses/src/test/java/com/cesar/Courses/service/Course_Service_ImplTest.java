@@ -3,8 +3,12 @@
  import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +17,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.cesar.Courses.feign.FeignStudent;
 import com.cesar.Courses.persistence.Course;
+import com.cesar.Courses.persistence.StudentDTO;
 import com.cesar.Courses.repository.Course_Repository;
 
 public class Course_Service_ImplTest {
@@ -21,11 +27,14 @@ public class Course_Service_ImplTest {
 	@Mock
 	private Course_Repository repo;
 	
+	@Mock
+	private FeignStudent client;
+	
 	@InjectMocks
 	private Course_Service_Impl service;
 	
-	private Long id;
-	private Course course;
+	private Long id = 1L;
+	private Course course = new Course();
 	
 	
 	@BeforeEach
@@ -33,9 +42,6 @@ public class Course_Service_ImplTest {
 		
 		MockitoAnnotations.openMocks(this);
 		
-		id = (long) 1;
-		
-		course = new Course();
 		course.setId( id );
 		course.setName( "Something" );
 	}
@@ -43,7 +49,7 @@ public class Course_Service_ImplTest {
 	
 	
 	@Test
-	void create_success() {
+	void create() {
 	
 		Course request = course;
 		request.setId(null);
@@ -54,11 +60,13 @@ public class Course_Service_ImplTest {
 		
 		assertThat( response ).isNotNull();
 		assertEquals( response, course );
+		
+		verify( repo ).save( any(Course.class ));
 	}
 	
 	
 	@Test
-	void getById_success() {
+	void getById() {
 		
 		when( repo.findById(id)).thenReturn( Optional.of( course ));
 		
@@ -68,16 +76,27 @@ public class Course_Service_ImplTest {
 		assertThat( foundCourse ).isNotNull();
 		assertEquals( foundCourse.getId(), course.getId() );
 		assertEquals( foundCourse.getName(), course.getName() );
+		
+		verify( repo ).findById(id);
 	}
 	
 	
 	@Test
-	void getById_notFound() {
+	void getStudentsByCourse() {
 		
-		when( repo.findById(id)).thenReturn( Optional.empty() );
+		StudentDTO student = new StudentDTO();
+		student.setName("Csar");
 		
-		Optional<Course> notFoundCourse = service.getById(id);
+		List<StudentDTO> students = new ArrayList<StudentDTO>();
+		students.add(student);
 		
-		assertThat( notFoundCourse ).isEmpty();
+		when( client.getStudentsByCourse(id)).thenReturn( students );
+		
+		List<StudentDTO> response = service.getStudentsByCourse(id);
+		
+		assertThat( response ).isNotEmpty();
+		
+		verify( client ).getStudentsByCourse(id);
+		verify( repo, never() ).findById(id);
 	}
 }

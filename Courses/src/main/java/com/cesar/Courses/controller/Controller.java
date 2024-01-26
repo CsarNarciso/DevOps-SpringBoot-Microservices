@@ -27,22 +27,13 @@ public class Controller {
 	@PostMapping("/create")
 	public ResponseEntity<?> create(@RequestBody Course course) {
 		
-		if ( course.getName() != null ) { 
+		if ( course.getName() != null && ! course.getName().isBlank() ) { 
+							
+			course.setId(null);
 			
-			if ( ! course.getName().isBlank() ) {
-				
-				if ( course.getId() != null ) {
-					
-					course.setId(null);
-				}
-				
-				Course response = service.create( course );
-				
-				if ( response != null ) {
-					
-					return ResponseEntity.status(HttpStatus.CREATED).body( response );
-				}
-			}
+			Course response = service.create( course );
+			
+			return ResponseEntity.status(HttpStatus.CREATED).body( response );
 		}
 			
 		return ResponseEntity.badRequest().body( "Name required" );

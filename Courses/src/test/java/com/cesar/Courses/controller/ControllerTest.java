@@ -52,7 +52,7 @@ public class ControllerTest {
 	
 	
 	@Test
-	public void createCourse_shouldReturnCreated() throws Exception {
+	public void createCourseWithName_shouldReturnCreated() throws Exception {
 		
 		Course request = new Course();
 		request.setName( "Something" );
@@ -73,6 +73,69 @@ public class ControllerTest {
 		
 		verify( service ).create( any(Course.class) );
 	}
+	
+	
+	@Test
+	public void createCourseWithNameAndId2_shouldReturnCreatedAndOvewriteId() throws Exception {
+		
+		Course request = new Course();
+		request.setName( "Something" );
+		request.setId( 2L );
+		
+		Course requestProceced = request;
+		requestProceced.setId( id );
+		
+		when( service.create(any(Course.class)) ).thenReturn( requestProceced );
+		
+		mvc.perform( post("/courses/create")
+				
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content( mapper.writeValueAsString( request ))
+			)
+		.andExpect( jsonPath("$.id", is(1) ))
+		.andExpect( status().isCreated() );
+		
+		verify( service ).create( any(Course.class) );
+	}
+	
+	
+	@Test
+	public void createdCourseWithNameInBlank_shouldReturnBadRequest() throws Exception {
+		
+		Course blankNameRequest = new Course();
+		blankNameRequest.setName("");
+		
+		mvc.perform( post("/courses/create")
+				
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content( mapper.writeValueAsString( blankNameRequest ))
+			)
+
+		.andExpect( status().isBadRequest() );
+		
+		verify( service, never() ).create( any(Course.class) );
+	}
+	
+	
+	@Test
+	public void createdCourseWithoutName_shouldReturnBadRequest() throws Exception {
+		
+		Course emptyNameRequest = new Course();
+		
+		mvc.perform( post("/courses/create")
+				
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content( mapper.writeValueAsString( emptyNameRequest ))
+			)
+
+		.andExpect( status().isBadRequest() );
+		
+		verify( service, never() ).create( any(Course.class) );
+	}
+	
 	
 	@Test
 	public void createdEmptyCourse_shouldReturnBadRequest() throws Exception {
